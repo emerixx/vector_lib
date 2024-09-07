@@ -35,38 +35,3 @@ int main() {
   CloseWindow();
   return 0;
 }
-
-/*
-void drawVector(const vector origin, vector vec, const Color clr) {
-  vector vec_local = vec;
-  // multiply by -1 since y+ is down
-  vec_local.y *= -1;
-  // add origin to vec since, (0, 0) is left top corner
-  vec_local = vec_local + origin;
-  // turn it 180 deg for some reason
-  double arrowAngle = pi - atan(vec.y / vec.x);
-  DrawLine(origin.x, origin.y, vec_local.x, vec_local.y, clr);
-
-  //  compute arrow ends
-  //  these 2 vectors would be correct if
-  //  1. I add origin to them (which i do later)
-  //  2. The vector im drawing is {0, n} where n∈ R and n > 0, follow up 2
-  //  lines down
-  if (vec.x < 0) {
-    arrowAngle += pi;
-  }
-  vector arrowEnd_1 =
-      vector(cos(arrowAngle - arrowTipAngle), sin(arrowAngle - arrowTipAngle)) *
-      arrowLength;
-  vector arrowEnd_2 =
-      vector(cos(arrowAngle + arrowTipAngle), sin(arrowAngle + arrowTipAngle)) *
-      arrowLength;
-  // we add origin and the vec (vec_local is the same) to these vectors bcz
-  // reasons stated at the start of the func
-  arrowEnd_1 = arrowEnd_1 + vec_local;
-  arrowEnd_2 = arrowEnd_2 + vec_local;
-
-  DrawLine(vec_local.x, vec_local.y, arrowEnd_1.x, arrowEnd_1.y, clr);
-  DrawLine(vec_local.x, vec_local.y, arrowEnd_2.x, arrowEnd_2.y, clr);
-  //
-}*/
