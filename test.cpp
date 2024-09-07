@@ -1,18 +1,16 @@
+#include "global_variables.hpp"
 #include "vector.hpp"
+#include "vector_visualizer.hpp"
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <raylib.h>
-const double pi = 3.14159265;
-const bool linearMode = false;
-vectorf win = vectorf(1600, 900);
-vector origin = vecfToVec(win) / 2;
-int arrowLength = 30;
-double arrowTipAngle = pi / 6; // = 30 deg
-void genGrid();
-void genGridTransformed(vector ihat_prime, vector jhat_prime);
-void drawVector(vector origin, vector vec, Color clr);
+const double pi = global.pi;
+vectorf win = global.win;
+vector origin = global.origin;
 int main() {
+  saveImage(genGridImage(15, {1, 1}, {0, 1}), "grid_test.png");
+  return 0;
   InitWindow(win.x, win.y, "");
   SetTargetFPS(60);
   Image grid_img = LoadImage("grid.png");
@@ -28,37 +26,17 @@ int main() {
     DrawTexture(grid, 0, 0, WHITE);
     ClearBackground(BLACK);
     drawVector(origin, vec, WHITE);
-    vec.transform({2, 1.7}, {0.43, -2});
+    vec.transform({1, 1}, {0, 1});
     drawVector(origin, vec, RED);
     DrawFPS(0, 0);
     EndDrawing();
   }
-
+  UnloadTexture(grid);
   CloseWindow();
   return 0;
 }
 
-void genGrid() {
-  Image img = GenImageColor(win.x, win.y, BLACK);
-  int spacing = 75;
-
-  ImageDrawLine(&img, origin.x, win.y, origin.x, 0, WHITE);
-  ImageDrawLine(&img, win.x, origin.y, 0, origin.y, WHITE);
-  for (int i = 1; i < origin.x / spacing; i++) {
-    ImageDrawLine(&img, origin.x + i * spacing, win.y, origin.x + i * spacing,
-                  0, DARKGRAY);
-    ImageDrawLine(&img, origin.x - i * spacing, win.y, origin.x - i * spacing,
-                  0, DARKGRAY);
-  }
-  for (int i = 1; i < origin.y / spacing; i++) {
-    ImageDrawLine(&img, win.x, origin.y + i * spacing, 0,
-                  origin.y + i * spacing, DARKGRAY);
-    ImageDrawLine(&img, win.x, origin.y - i * spacing, 0,
-                  origin.y - i * spacing, DARKGRAY);
-  }
-  ExportImage(img, "grid.png");
-  UnloadImage(img);
-}
+/*
 void drawVector(const vector origin, vector vec, const Color clr) {
   vector vec_local = vec;
   // multiply by -1 since y+ is down
@@ -91,4 +69,4 @@ void drawVector(const vector origin, vector vec, const Color clr) {
   DrawLine(vec_local.x, vec_local.y, arrowEnd_1.x, arrowEnd_1.y, clr);
   DrawLine(vec_local.x, vec_local.y, arrowEnd_2.x, arrowEnd_2.y, clr);
   //
-}
+}*/

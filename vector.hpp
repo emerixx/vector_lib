@@ -13,8 +13,8 @@ public:
   vector unit();
   double mag();
   vector opposite();
-  void transform(vector ihat, vector jhat);
-  vector transform_return(vector ihat, vector jhat);
+  void transform(vector ihat_prime, vector jhat_prime);
+  vector transform_return(vector ihat_prime, vector jhat_prime);
 };
 
 struct vectorf {
