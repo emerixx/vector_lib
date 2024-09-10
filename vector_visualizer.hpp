@@ -8,6 +8,8 @@
 
 Image genGridImage_normal(int spacing);
 Image genGridImage(int spacing, vector ihat_prime, vector jhat_prime);
+void draw_line_vec(vector start, vector end, Color clr);
+void drawGrid(int spacing, vector ihat_prime, vector jhat_prime);
 void drawGridImage(Image grid);
 void drawVector(const vector origin, vector vec, const Color clr);
 void saveImage(Image img, std::string name);
