@@ -6,8 +6,8 @@
 #include <iostream>
 #include <raylib.h>
 const double pi = global.pi;
-vectorf win = global.win;
-vector origin = global.origin;
+vector2 win = global.win;
+vector2 origin = global.origin;
 int main() {
 
   saveImage(genGridImage(15, {1, 0}, {0, 1}), "grid_test.png");
@@ -17,7 +17,7 @@ int main() {
   Image grid_img = genGridImage(45, {1, 0}, {0, 1});
   Texture2D grid = LoadTextureFromImage(grid_img);
   UnloadImage(grid_img);
-  vector vec;
+  vector2 vec;
   double i = 0;
   Color clrs[] = {WHITE, RED, BLUE, GREEN, VIOLET, LIGHTGRAY, YELLOW};
   while (!WindowShouldClose()) {
@@ -25,7 +25,7 @@ int main() {
       i += 1.f / 600;
     }
     Vector2 mousepos = GetMousePosition();
-    vec = vector(mousepos.x, mousepos.y) - origin;
+    vec = vector2(mousepos.x, mousepos.y) - origin;
     vec.y *= -1;
     BeginDrawing();
 

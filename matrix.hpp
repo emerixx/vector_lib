@@ -1,3 +1,3 @@
 #include "vector.hpp"
 
-class matrix {}
+class matrix {};

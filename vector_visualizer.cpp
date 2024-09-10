@@ -7,28 +7,28 @@
 // less code
 const double pi = global.pi;
 
-void draw_line_vec(vector start, vector end, Color clr) {
+void draw_line_vec(vector2 start, vector2 end, Color clr) {
   // this fuctiion draws a line from one point to another onto current renderer,
   // (0, 0) = middle of screen, y+ = up, x+ = right
-  vector origin = global.origin;
+  vector2 origin = global.origin;
   // transforming by {1, 0}, {0, -1} just does vec.y=-vec.y
   // add origin since raylib uwu
-  vector start_loc = start.transform_return({1, 0}, {0, -1}) + origin;
-  vector end_loc = end.transform_return({1, 0}, {0, -1}) + origin;
+  vector2 start_loc = start.transform_return({1, 0}, {0, -1}) + origin;
+  vector2 end_loc = end.transform_return({1, 0}, {0, -1}) + origin;
   DrawLine(start_loc.x, start_loc.y, end_loc.x, end_loc.y, clr);
 }
-void img_draw_line_vec(Image *dst, vector start, vector end, Color clr) {
+void img_draw_line_vec(Image *dst, vector2 start, vector2 end, Color clr) {
   // this fuctiion draws a line from one point to another onto an img
   // (0, 0) = middle of screen, y+ = up, x+ = right
-  vector origin = global.origin;
+  vector2 origin = global.origin;
   // transforming by {1, 0}, {0, -1} just does vec.y=-vec.y
   // add origin since raylib uwu
-  vector start_loc = start.transform_return({1, 0}, {0, -1}) + origin;
-  vector end_loc = end.transform_return({1, 0}, {0, -1}) + origin;
+  vector2 start_loc = start.transform_return({1, 0}, {0, -1}) + origin;
+  vector2 end_loc = end.transform_return({1, 0}, {0, -1}) + origin;
   ImageDrawLine(dst, start_loc.x, start_loc.y, end_loc.x, end_loc.y, clr);
 }
-void drawVector(const vector origin, vector vec, const Color clr) {
-  vector vec_local = vec;
+void drawVector(const vector2 origin, vector2 vec, const Color clr) {
+  vector2 vec_local = vec;
   // multiply by -1 since y+ is down
   vec_local.y *= -1;
   // add origin to vec since, (0, 0) is left top corner
@@ -45,12 +45,12 @@ void drawVector(const vector origin, vector vec, const Color clr) {
   if (vec.x < 0) {
     arrowAngle += pi;
   }
-  vector arrowEnd_1 = vector(cos(arrowAngle - global.arrow_tip_line_angle),
-                             sin(arrowAngle - global.arrow_tip_line_angle)) *
-                      global.arrow_tip_line_length;
-  vector arrowEnd_2 = vector(cos(arrowAngle + global.arrow_tip_line_angle),
-                             sin(arrowAngle + global.arrow_tip_line_angle)) *
-                      global.arrow_tip_line_length;
+  vector2 arrowEnd_1 = vector2(cos(arrowAngle - global.arrow_tip_line_angle),
+                               sin(arrowAngle - global.arrow_tip_line_angle)) *
+                       global.arrow_tip_line_length;
+  vector2 arrowEnd_2 = vector2(cos(arrowAngle + global.arrow_tip_line_angle),
+                               sin(arrowAngle + global.arrow_tip_line_angle)) *
+                       global.arrow_tip_line_length;
   // we add origin and the vec (vec_local is the same) to these vectors bcz
   // reasons stated at the start of the func
   arrowEnd_1 = arrowEnd_1 + vec_local;
@@ -61,8 +61,8 @@ void drawVector(const vector origin, vector vec, const Color clr) {
   //
 }
 Image genGridImage_normal(int spacing) {
-  vectorf win = global.win;
-  vector origin = global.origin;
+  vector2 win = global.win;
+  vector2 origin = global.origin;
   Image img = GenImageColor(global.win.x, global.win.y, BLACK);
 
   ImageDrawLine(&img, origin.x, win.y, origin.x, 0, WHITE);
@@ -85,13 +85,13 @@ void saveImage(Image img, std::string name) {
   ExportImage(img, name.c_str());
   UnloadImage(img);
 }
-void drawGrid(int spacing, vector ihat_prime, vector jhat_prime) {
+void drawGrid(int spacing, vector2 ihat_prime, vector2 jhat_prime) {
 
-  vector win = vecfToVec(global.win) / 2;
-  vector origin = global.origin;
+  vector2 win = global.win / 2;
+  vector2 origin = global.origin;
   double done = 0;
-  vector toDrawStart;
-  vector toDrawEnd;
+  vector2 toDrawStart;
+  vector2 toDrawEnd;
 
   // transform each corner (non transformed) by inverse matrix of ihat_prime and
   // det(A) = ad-bc
@@ -100,22 +100,22 @@ void drawGrid(int spacing, vector ihat_prime, vector jhat_prime) {
   // 1/(ad-bc) *
   // vector inverse_ihat_prime = 1 / ()
 
-  vector corner_grid_top_left = vector(-win.x / 2, -win.y / 2);
-  vector corner_grid_top_right = vector(win.x / 2, -win.y / 2);
+  vector2 corner_grid_top_left = vector2(-win.x / 2, -win.y / 2);
+  vector2 corner_grid_top_right = vector2(win.x / 2, -win.y / 2);
 
-  vector corner_grid_bottom_left = vector(-win.x / 2, win.y / 2);
+  vector2 corner_grid_bottom_left = vector2(-win.x / 2, win.y / 2);
 
-  vector corner_grid_bottom_right = vector(win.x / 2, win.y / 2);
+  vector2 corner_grid_bottom_right = vector2(win.x / 2, win.y / 2);
 
-  vector corner_grid_top_left_trans =
+  vector2 corner_grid_top_left_trans =
       corner_grid_top_left.transform_return(ihat_prime, jhat_prime);
-  vector corner_grid_top_right_trans =
+  vector2 corner_grid_top_right_trans =
       corner_grid_top_right.transform_return(ihat_prime, jhat_prime);
 
-  vector corner_grid_bottom_left_trans =
+  vector2 corner_grid_bottom_left_trans =
       corner_grid_bottom_left.transform_return(ihat_prime, jhat_prime);
 
-  vector corner_grid_bottom_right_trans =
+  vector2 corner_grid_bottom_right_trans =
       corner_grid_bottom_right.transform_return(ihat_prime, jhat_prime);
   // vector <= vector check if all values are <= (x,y and z)
 
@@ -161,23 +161,23 @@ void drawGrid(int spacing, vector ihat_prime, vector jhat_prime) {
     draw_line_vec(toDrawStart, toDrawEnd, GREEN);
   }
 }
-Image genGridImage(int spacing, vector ihat_prime, vector jhat_prime) {
+Image genGridImage(int spacing, vector2 ihat_prime, vector2 jhat_prime) {
 
-  vector win = vecfToVec(global.win);
-  vector origin = global.origin;
-  vector toDrawStart;
-  vector toDrawEnd;
+  vector2 win = global.win;
+  vector2 origin = global.origin;
+  vector2 toDrawStart;
+  vector2 toDrawEnd;
   Image img = GenImageColor(global.win.x, global.win.y, BLACK);
-  vector corner_top_left =
-      vector(0, 0).transform_return(ihat_prime, jhat_prime);
-  vector corner_top_right =
-      vector(win.x, 0).transform_return(ihat_prime, jhat_prime);
+  vector2 corner_top_left =
+      vector2(0, 0).transform_return(ihat_prime, jhat_prime);
+  vector2 corner_top_right =
+      vector2(win.x, 0).transform_return(ihat_prime, jhat_prime);
 
-  vector corner_bottom_left =
-      vector(0, win.y).transform_return(ihat_prime, jhat_prime);
+  vector2 corner_bottom_left =
+      vector2(0, win.y).transform_return(ihat_prime, jhat_prime);
 
-  vector corner_bottom_right =
-      vector(win.x, win.y).transform_return(ihat_prime, jhat_prime);
+  vector2 corner_bottom_right =
+      vector2(win.x, win.y).transform_return(ihat_prime, jhat_prime);
   /*
     img_draw_line_vec(&img, corner_top_left, corner_top_right, WHITE);
     img_draw_line_vec(&img, corner_top_right, corner_bottom_right, WHITE);
@@ -189,32 +189,32 @@ Image genGridImage(int spacing, vector ihat_prime, vector jhat_prime) {
     return img;
     */
   toDrawStart =
-      vector(0, win.y - origin.y).transform_return(ihat_prime, jhat_prime) +
+      vector2(0, win.y - origin.y).transform_return(ihat_prime, jhat_prime) +
       origin;
   toDrawEnd =
-      vector(0, -origin.y).transform_return(ihat_prime, jhat_prime) + origin;
+      vector2(0, -origin.y).transform_return(ihat_prime, jhat_prime) + origin;
   ImageDrawLine(&img, toDrawStart.x, toDrawStart.y, toDrawEnd.x, toDrawEnd.y,
                 WHITE);
   toDrawStart =
-      vector(win.x - origin.x, 0).transform_return(ihat_prime, jhat_prime) +
+      vector2(win.x - origin.x, 0).transform_return(ihat_prime, jhat_prime) +
       origin;
   toDrawEnd =
-      vector(-origin.x, 0).transform_return(ihat_prime, jhat_prime) + origin;
+      vector2(-origin.x, 0).transform_return(ihat_prime, jhat_prime) + origin;
   ImageDrawLine(&img, toDrawStart.x, toDrawStart.y, toDrawEnd.x, toDrawEnd.y,
                 WHITE);
   for (int i = 1; i < origin.x / spacing; i++) {
-    toDrawStart = vector(i * spacing, win.y - origin.y)
+    toDrawStart = vector2(i * spacing, win.y - origin.y)
                       .transform_return(ihat_prime, jhat_prime) +
                   origin;
-    toDrawEnd = vector(i * spacing, -origin.y)
+    toDrawEnd = vector2(i * spacing, -origin.y)
                     .transform_return(ihat_prime, jhat_prime) +
                 origin;
     ImageDrawLine(&img, toDrawStart.x, toDrawStart.y, toDrawEnd.x, toDrawEnd.y,
                   DARKGRAY);
-    toDrawStart = vector(-i * spacing, win.y - origin.y)
+    toDrawStart = vector2(-i * spacing, win.y - origin.y)
                       .transform_return(ihat_prime, jhat_prime) +
                   origin;
-    toDrawEnd = vector(-i * spacing, -origin.y)
+    toDrawEnd = vector2(-i * spacing, -origin.y)
                     .transform_return(ihat_prime, jhat_prime) +
                 origin;
     ImageDrawLine(&img, toDrawStart.x, toDrawStart.y, toDrawEnd.x, toDrawEnd.y,
@@ -222,18 +222,18 @@ Image genGridImage(int spacing, vector ihat_prime, vector jhat_prime) {
   }
 
   for (int i = 1; i < origin.y / spacing; i++) {
-    toDrawStart = vector(win.x - origin.x, i * spacing)
+    toDrawStart = vector2(win.x - origin.x, i * spacing)
                       .transform_return(ihat_prime, jhat_prime) +
                   origin;
-    toDrawEnd = vector(-origin.x, i * spacing)
+    toDrawEnd = vector2(-origin.x, i * spacing)
                     .transform_return(ihat_prime, jhat_prime) +
                 origin;
     ImageDrawLine(&img, toDrawStart.x, toDrawStart.y, toDrawEnd.x, toDrawEnd.y,
                   DARKGRAY);
-    toDrawStart = vector(win.x - origin.x, -i * spacing)
+    toDrawStart = vector2(win.x - origin.x, -i * spacing)
                       .transform_return(ihat_prime, jhat_prime) +
                   origin;
-    toDrawEnd = vector(-origin.x, -i * spacing)
+    toDrawEnd = vector2(-origin.x, -i * spacing)
                     .transform_return(ihat_prime, jhat_prime) +
                 origin;
     ImageDrawLine(&img, toDrawStart.x, toDrawStart.y, toDrawEnd.x, toDrawEnd.y,
