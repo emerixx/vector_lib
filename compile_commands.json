@@ -1,0 +1,52 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "vector.cpp"
+    ],
+    "directory": "/home/emerix/coding/cpp/vector_lib",
+    "file": "/home/emerix/coding/cpp/vector_lib/vector.cpp"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "matrix.cpp"
+    ],
+    "directory": "/home/emerix/coding/cpp/vector_lib",
+    "file": "/home/emerix/coding/cpp/vector_lib/matrix.cpp"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "global_variables.cpp"
+    ],
+    "directory": "/home/emerix/coding/cpp/vector_lib",
+    "file": "/home/emerix/coding/cpp/vector_lib/global_variables.cpp"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "vector_visualizer.cpp"
+    ],
+    "directory": "/home/emerix/coding/cpp/vector_lib",
+    "file": "/home/emerix/coding/cpp/vector_lib/vector_visualizer.cpp"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "test.cpp"
+    ],
+    "directory": "/home/emerix/coding/cpp/vector_lib",
+    "file": "/home/emerix/coding/cpp/vector_lib/test.cpp"
+  }
+]

@@ -1,8 +1,13 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <array>
 #include <string>
-
+#include <vector>
+using vector_container = std::vector<std::vector<double>>;
+using vector_double = std::vector<double>;
+namespace mml {
+class matrix;
 class vector2 {
 public:
   double x;
@@ -13,22 +18,46 @@ public:
   double mag();
   vector2 opposite();
   void transform(vector2 ihat_prime, vector2 jhat_prime);
+  void transform(matrix &transformation_matrix);
   vector2 transform_return(vector2 ihat_prime, vector2 jhat_prime);
+  vector2 transform_return(matrix &transformation_matrix);
   vector2 abs();
 };
 
-vector2 operator-(vector2 a, vector2 b);
-vector2 operator+(vector2 a, vector2 b);
-vector2 operator/(vector2 a, double b);
-vector2 operator*(vector2 a, double b);
-vector2 operator*(vector2 a, vector2 b);
-bool operator>(vector2 a, vector2 b);
-bool operator>=(vector2 a, vector2 b);
-bool operator<(vector2 a, vector2 b);
-bool operator<=(vector2 a, vector2 b);
+double dot(vector2 a, vector2 b);
+
 void printvec(vector2 a);
 void printvec(vector2 a, std::string name);
 
+class matrix {
+private:
+  uint max_size = 32; // defined to prevent accidents
+  vector_container matrx_vec;
+
+  mml::vector2 matrix_size;
+
+public:
+  matrix(mml::vector2 arg_size);
+
+  void print();
+  mml::vector2 getSize();
+  double &operator[](size_t row, size_t col);
+  vector_double &operator[](size_t row);
+};
+
+} // namespace mml
+
+mml::vector2 operator-(mml::vector2 a, mml::vector2 b);
+mml::vector2 operator+(mml::vector2 a, mml::vector2 b);
+mml::vector2 operator/(mml::vector2 a, double b);
+mml::vector2 operator*(mml::vector2 a, double b);
+mml::vector2 operator*(mml::vector2 a, mml::vector2 b);
+bool operator>(mml::vector2 a, mml::vector2 b);
+bool operator>=(mml::vector2 a, mml::vector2 b);
+bool operator<(mml::vector2 a, mml::vector2 b);
+bool operator<=(mml::vector2 a, mml::vector2 b);
+bool operator==(mml::vector2 a, mml::vector2 b);
+bool operator!=(mml::vector2 a, mml::vector2 b);
 /*
 class vector3 {
 public:
