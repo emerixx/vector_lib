@@ -9,12 +9,14 @@ const double pi = global.pi;
 mml::vector2 win = global.win;
 mml::vector2 origin = global.origin;
 int main() {
-  mml::matrix matrix = mml::matrix({2, 3});
+  mml::matrix matrix = mml::matrix({2, 2});
   matrix.print();
-  matrix[1, 2] = 1;
+  matrix[0] = {0, 1};
+  matrix[1] = {1, 0};
   matrix.print();
-  // saveImage(genGridImage(15, {1, 0}, {0, 1}), "grid_test.png");
+  std::cout << matrix.determinant() << "\n";
   return 0;
+  // saveImage(genGridImage(15, {1, 0}, {0, 1}), "grid_test.png");
   InitWindow(win.x, win.y, "");
   SetTargetFPS(60);
   Image grid_img = genGridImage(45, {1, 0}, {0, 1});

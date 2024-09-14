@@ -41,6 +41,8 @@ public:
 
   void print();
   mml::vector2 getSize();
+  double determinant();
+  mml::matrix inverse(); // turn this matrix to its own inverse, A = A^-1
   double &operator[](size_t row, size_t col);
   vector_double &operator[](size_t row);
 };

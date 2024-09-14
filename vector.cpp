@@ -54,9 +54,11 @@ mml::vector2 mml::vector2::transform_return(mml::vector2 ihat_prime,
 }
 mml::vector2
 mml::vector2::transform_return(mml::matrix &transformation_matrix) {
-  if (transformation_matrix.getSize() != mml::vector2(2, 2))
+  if (transformation_matrix.getSize() != mml::vector2(2, 2)) {
+    std::cout << "umm, matrix is too big for me UwU (error transforming a "
+                 "vector, matrix is bigger than 2x2)\n";
     return vector2(0, 0);
-
+  }
   mml::matrix mtrx = transformation_matrix;
   mml::vector2 ihat_prime = {mtrx[0, 0], mtrx[0, 1]};
   mml::vector2 jhat_prime = {mtrx[1, 0], mtrx[1, 1]};
@@ -69,6 +71,11 @@ void mml::vector2::transform(mml::vector2 ihat_prime, mml::vector2 jhat_prime) {
   x = setx;
 }
 void mml::vector2::transform(mml::matrix &transformation_matrix) {
+  if (transformation_matrix.getSize() != mml::vector2(2, 2)) {
+    std::cout << "umm, matrix is too big for me UwU (error transforming a "
+                 "vector, matrix is bigger than 2x2)\n";
+    return;
+  }
   mml::matrix mtrx = transformation_matrix;
   mml::vector2 ihat_prime = {mtrx[0, 0], mtrx[0, 1]};
   mml::vector2 jhat_prime = {mtrx[1, 0], mtrx[1, 1]};
@@ -116,7 +123,7 @@ void mml::matrix::print() {
     }
     std::cout << "|";
   }
-  std::cout << "\n";
+  std::cout << "\n----\n";
 }
 mml::vector2 mml::matrix::getSize() { return matrix_size; }
 double &mml::matrix::operator[](size_t row, size_t col) {
@@ -127,6 +134,28 @@ double &mml::matrix::operator[](size_t row, size_t col) {
     exit(-1);
   }
   return matrx_vec[row][col];
+}
+
+vector_double &mml::matrix::operator[](size_t row) {
+  if (row >= matrix_size.y) {
+    std::cout
+        << "ERROR: trying to access element outside of matrix\nexiting...\n";
+    exit(-1);
+  }
+  return matrx_vec[row];
+}
+
+double mml::matrix::determinant() {
+  if (getSize() != vector2(2, 2)) {
+    std::cout << "umm, matrix is too big for me UwU (error finding the "
+                 "determinant of a "
+                 "matrix, matrix is bigger than 2x2)\n";
+    return 0;
+  }
+  matrix A = *this;
+  // det(A) = ad-bc
+  // det(A) = [0,0]*[1,1] - [1,0]*[0,1]
+  return A[0, 0] * A[1, 1] - A[1, 0] * A[0, 1];
 }
 
 double sign(double a) { return a / std::abs(a); }
