@@ -77,8 +77,8 @@ void mml::vector2::transform(mml::matrix &transformation_matrix) {
     return;
   }
   mml::matrix mtrx = transformation_matrix;
-  mml::vector2 ihat_prime = {mtrx[0, 0], mtrx[0, 1]};
-  mml::vector2 jhat_prime = {mtrx[1, 0], mtrx[1, 1]};
+  mml::vector2 ihat_prime = {mtrx[0, 0], mtrx[1, 0]};
+  mml::vector2 jhat_prime = {mtrx[0, 1], mtrx[1, 1]};
   double setx = ihat_prime.x * x + jhat_prime.x * y;
   y = ihat_prime.y * x + jhat_prime.y * y;
   x = setx;
@@ -156,6 +156,50 @@ double mml::matrix::determinant() {
   // det(A) = ad-bc
   // det(A) = [0,0]*[1,1] - [1,0]*[0,1]
   return A[0, 0] * A[1, 1] - A[1, 0] * A[0, 1];
+}
+void mml::matrix::invert() {
+  if (getSize() != vector2(2, 2)) {
+    std::cout << "umm, matrix is too big for me UwU (error finding the "
+                 "inverse matrix of a "
+                 "matrix, matrix is bigger than 2x2)\n";
+    return;
+  }
+  matrix A = *this;
+  matrix temp_mat = mml::matrix({2, 2});
+  double det = A.determinant();
+  // B:
+  //  --         --
+  //  |  A.d -A.b |
+  //  | -A.c  A.a |
+  //  --         --
+  // A^-1 = det(A)^-1 * B
+  temp_mat[0, 0] = 1 / det * A[1, 1];
+  temp_mat[0, 1] = 1 / det * -A[0, 1];
+  temp_mat[1, 0] = 1 / det * -A[1, 0];
+  temp_mat[1, 1] = 1 / det * A[0, 0];
+  *this = temp_mat;
+}
+mml::matrix mml::matrix::inverse() {
+  if (getSize() != vector2(2, 2)) {
+    std::cout << "umm, matrix is too big for me UwU (error finding the "
+                 "inverse matrix of a "
+                 "matrix, matrix is bigger than 2x2)\n";
+    return mml::matrix({2, 2});
+  }
+  matrix A = *this;
+  matrix temp_mat = mml::matrix({2, 2});
+  double det = A.determinant();
+  // B:
+  //  --         --
+  //  |  A.d -A.b |
+  //  | -A.c  A.a |
+  //  --         --
+  // A^-1 = det(A)^-1 * B
+  temp_mat[0, 0] = 1 / det * A[1, 1];
+  temp_mat[0, 1] = 1 / det * -A[0, 1];
+  temp_mat[1, 0] = 1 / det * -A[1, 0];
+  temp_mat[1, 1] = 1 / det * A[0, 0];
+  return temp_mat;
 }
 
 double sign(double a) { return a / std::abs(a); }
