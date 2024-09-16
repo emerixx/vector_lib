@@ -10,10 +10,10 @@ mml::vector2 win = global.win;
 mml::vector2 origin = global.origin;
 int main() {
   mml::matrix mtrx = mml::matrix({2, 2});
-  mtrx[0] = {1, 0.5};
-  mtrx[1] = {0.5, 1};
-  mml::matrix normal_matrix = mtrx;
-  // saveImage(genGridImage(15, {1, 0}, {0, 1}), "grid_test.png");
+  mml::matrix normal_matrix = mml::matrix({2, 2});
+  normal_matrix[0] = {1, 0};
+  normal_matrix[1] = {0, 1};
+  // saveImage(genGridImage(15, {1, 0}, {0,,, 1}), "grid_test.png");
   SetTraceLogLevel(LOG_WARNING);
   InitWindow(win.x, win.y, "");
   SetTargetFPS(60);
@@ -21,29 +21,31 @@ int main() {
   Texture2D grid = LoadTextureFromImage(grid_img);
   UnloadImage(grid_img);
   mml::vector2 vec;
-  double i = 0;
+  double theta = 0;
   Color clrs[] = {WHITE, RED, BLUE, GREEN, VIOLET, LIGHTGRAY, YELLOW};
   while (!WindowShouldClose()) {
-    if (i < pi * 2.f / 3 && 0) {
-      i += 1.f / 600;
-      mtrx[0, 1] = i;
-      mtrx[1, 0] = i;
+    if (theta < 2 * pi) {
+      theta += 1.f / 600;
+      // mtrx[0] = {cos(theta), -sin(theta)};
+      mtrx[0] = {1, theta};
+      // mtrx[1] = {sin(theta), cos(theta)};
+      mtrx[1] = {theta, 1};
     } else {
-      i = 0;
+      theta = 0;
     }
     Vector2 mps = GetMousePosition();
     mml::vector2 mousepos = mml::vector2(mps.x, mps.y);
     vec = mml::vector2(mousepos.x, mousepos.y) - origin;
     vec.y *= -1;
+    vec.transform(mtrx);
     BeginDrawing();
 
     ClearBackground(BLACK);
     DrawTexture(grid, 0, 0, WHITE);
-    drawGrid(60, mtrx);
-    // drawGrid(60, normal_matrix);
-    drawGridOLD(60, mtrx);
-
+    drawGrid(10, mtrx);
     // drawVector(origin, vec, clrs[0]);
+    //  drawGrid(60, normal_matrix);
+
     DrawFPS(0, 0);
     EndDrawing();
   }

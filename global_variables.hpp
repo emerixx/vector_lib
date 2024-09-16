@@ -9,6 +9,7 @@ struct {
   const int arrow_tip_line_length = 30;
   const mml::vector2 win = mml::vector2(16 * 70, 9 * 70);
   const mml::vector2 origin = win / 2;
+
 } global;
 
 #endif // GLOBAL_VARIABLES_H

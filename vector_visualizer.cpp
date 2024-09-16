@@ -2,13 +2,15 @@
 #include "global_variables.hpp"
 #include "vector.hpp"
 #include <cmath>
+#include <iostream>
 #include <raylib.h>
 // umm, iirc i use pi somewhere, so i just assign it from globa.pi to pi so its
 // less code
+
 const double pi = global.pi;
 
 void draw_line_vec(mml::vector2 start, mml::vector2 end, Color clr) {
-  // this fuctiion draws a line from one point to another onto current renderer,
+  // this fuction draws a line from one point to another onto current renderer,
   // (0, 0) = middle of screen, y+ = up, x+ = right
   mml::vector2 origin = global.origin;
   // transforming by {1, 0}, {0, -1} just does vec.y=-vec.y
@@ -19,7 +21,7 @@ void draw_line_vec(mml::vector2 start, mml::vector2 end, Color clr) {
 }
 void img_draw_line_vec(Image *dst, mml::vector2 start, mml::vector2 end,
                        Color clr) {
-  // this fuctiion draws a line from one point to another onto an img
+  // this fuction draws a line from one point to another onto an img
   // (0, 0) = middle of screen, y+ = up, x+ = right
   mml::vector2 origin = global.origin;
   // transforming by {1, 0}, {0, -1} just does vec.y=-vec.y
@@ -63,42 +65,24 @@ void drawVector(const mml::vector2 origin, mml::vector2 vec, const Color clr) {
   DrawLine(vec_local.x, vec_local.y, arrowEnd_2.x, arrowEnd_2.y, clr);
   //
 }
-Image genGridImage_normal(int spacing) {
-  mml::vector2 win = global.win;
-  mml::vector2 origin = global.origin;
-  Image img = GenImageColor(global.win.x, global.win.y, BLACK);
 
-  ImageDrawLine(&img, origin.x, win.y, origin.x, 0, WHITE);
-  ImageDrawLine(&img, win.x, origin.y, 0, origin.y, WHITE);
-  for (int i = 1; i < origin.x / spacing; i++) {
-    ImageDrawLine(&img, origin.x + i * spacing, win.y, origin.x + i * spacing,
-                  0, DARKGRAY);
-    ImageDrawLine(&img, origin.x - i * spacing, win.y, origin.x - i * spacing,
-                  0, DARKGRAY);
-  }
-  for (int i = 1; i < origin.y / spacing; i++) {
-    ImageDrawLine(&img, win.x, origin.y + i * spacing, 0,
-                  origin.y + i * spacing, DARKGRAY);
-    ImageDrawLine(&img, win.x, origin.y - i * spacing, 0,
-                  origin.y - i * spacing, DARKGRAY);
-  }
-  return img;
-}
-void saveImage(Image img, std::string name) {
-  ExportImage(img, name.c_str());
-  UnloadImage(img);
-}
+// TODO
+// TODO
+// fix pls
 void drawGrid(int spacing, mml::matrix transformation_matrix) {
 
-  mml::vector2 win = global.win / 1.2;
+  mml::vector2 win = global.win / 2;
   mml::vector2 origin = global.origin;
   double done = 0;
   mml::vector2 toDrawStart;
   mml::vector2 toDrawEnd;
-  mml::vector2 ihat_prime = {transformation_matrix[0, 0],
-                             transformation_matrix[1, 0]};
-  mml::vector2 jhat_prime = {transformation_matrix[0, 1],
-                             transformation_matrix[1, 1]};
+
+  mml::matrix normal_matrix = mml::matrix({2, 2});
+  normal_matrix[0] = {1, 0};
+  normal_matrix[1] = {0, 1};
+  mml::vector2 normal_ihat, normal_jhat;
+  normal_ihat = {normal_matrix[0, 0], normal_matrix[1, 0]};
+  normal_jhat = {normal_matrix[0, 1], normal_matrix[1, 1]};
   // transform each corner (non transformed) by inverse matrix of ihat_prime and
   mml::matrix inverse_transformation_matrix = transformation_matrix.inverse();
   mml::vector2 corner_grid_top_left = mml::vector2(-win.x / 2, -win.y / 2);
@@ -108,13 +92,24 @@ void drawGrid(int spacing, mml::matrix transformation_matrix) {
 
   mml::vector2 corner_grid_bottom_right = mml::vector2(win.x / 2, win.y / 2);
 
-  mml::vector2 corner_grid_top_left_trans = corner_grid_top_left;
-  mml::vector2 corner_grid_top_right_trans = corner_grid_top_right;
+  mml::vector2 corner_grid_top_left_trans =
+      corner_grid_top_left.transform_return(transformation_matrix);
+  mml::vector2 corner_grid_top_right_trans =
+      corner_grid_top_right.transform_return(transformation_matrix);
 
-  mml::vector2 corner_grid_bottom_left_trans = corner_grid_bottom_left;
+  mml::vector2 corner_grid_bottom_left_trans =
+      corner_grid_bottom_left.transform_return(transformation_matrix);
 
-  mml::vector2 corner_grid_bottom_right_trans = corner_grid_bottom_right;
+  mml::vector2 corner_grid_bottom_right_trans =
+      corner_grid_bottom_right.transform_return(transformation_matrix);
   // vector <= vector check if all values are <= (x,y and z)
+  draw_line_vec(corner_grid_top_left, corner_grid_top_right, GRAY);
+  draw_line_vec(corner_grid_top_right, corner_grid_bottom_right, GRAY);
+  draw_line_vec(corner_grid_bottom_right, corner_grid_bottom_left, GRAY);
+  draw_line_vec(corner_grid_bottom_left, corner_grid_top_left, GRAY);
+
+  draw_line_vec(corner_grid_top_right, corner_grid_bottom_left, ORANGE);
+  draw_line_vec(corner_grid_top_left, corner_grid_bottom_right, ORANGE);
 
   draw_line_vec(corner_grid_top_left_trans, corner_grid_top_right_trans, WHITE);
   draw_line_vec(corner_grid_top_right_trans, corner_grid_bottom_right_trans,
@@ -140,44 +135,49 @@ void drawGrid(int spacing, mml::matrix transformation_matrix) {
 
   mml::matrix inverse_transformation_matrix_jhat_prime = mml::matrix({2, 2});
   inverse_transformation_matrix_jhat_prime = temp_trans_matrix.inverse();
+  if (transformation_matrix[0, 1] < 0)
+    transformation_matrix.invert();
+  mml::vector2 ihat_prime = {transformation_matrix[0, 0],
+                             transformation_matrix[1, 0]};
+  mml::vector2 jhat_prime = {transformation_matrix[0, 1],
+                             transformation_matrix[1, 1]};
 
-  for (int i = 0; i < corner_grid_top_right_trans.x / spacing; i++) {
-    done = i / (corner_grid_top_right_trans.x / spacing);
+  for (int i = 0; i < corner_grid_top_right_trans.mag() / spacing; i++) {
+    done = i / (corner_grid_top_right_trans.mag() / spacing);
+    // check what point will be at corner_grid_bottom_left after transformation
+    // and transform that point
+    // create a function to create a 2x2 matrix from jhat and ihat late TODO
+
     toDrawStart =
-        corner_grid_bottom_left.transform_return(ihat_prime * done, jhat_prime)
-            .transform_return(inverse_transformation_matrix_ihat_prime);
+        corner_grid_bottom_left.transform_return(ihat_prime * done, jhat_prime);
     toDrawEnd =
-        corner_grid_top_left.transform_return(ihat_prime * done, jhat_prime)
-            .transform_return(inverse_transformation_matrix_ihat_prime);
+        corner_grid_top_left.transform_return(ihat_prime * done, jhat_prime);
 
     draw_line_vec(toDrawStart, toDrawEnd, GREEN);
-    toDrawStart =
-        corner_grid_bottom_right.transform_return(ihat_prime * done, jhat_prime)
-            .transform_return(inverse_transformation_matrix_ihat_prime);
+    toDrawStart = corner_grid_bottom_right.transform_return(ihat_prime * done,
+                                                            jhat_prime);
     toDrawEnd =
-        corner_grid_top_right.transform_return(ihat_prime * done, jhat_prime)
-            .transform_return(inverse_transformation_matrix_ihat_prime);
+        corner_grid_top_right.transform_return(ihat_prime * done, jhat_prime);
     draw_line_vec(toDrawStart, toDrawEnd, GREEN);
   }
-  for (int i = 0; i < origin.y / spacing; i++) {
-    done = i / (origin.y / spacing);
+  for (int i = 0; i < std::abs(corner_grid_top_right.y) / spacing; i++) {
+    done = i / (std::abs(corner_grid_top_right.y) / spacing);
     toDrawStart =
-        corner_grid_top_left.transform_return(ihat_prime, jhat_prime * done)
-            .transform_return(inverse_transformation_matrix_jhat_prime);
+        corner_grid_top_left.transform_return(ihat_prime, jhat_prime * done);
     toDrawEnd =
-        corner_grid_top_right.transform_return(ihat_prime, jhat_prime * done)
-            .transform_return(inverse_transformation_matrix_jhat_prime);
+        corner_grid_top_right.transform_return(ihat_prime, jhat_prime * done);
 
     draw_line_vec(toDrawStart, toDrawEnd, PURPLE);
     toDrawStart =
-        corner_grid_bottom_left.transform_return(ihat_prime, jhat_prime * done)
-            .transform_return(inverse_transformation_matrix_jhat_prime);
-    toDrawEnd =
-        corner_grid_bottom_right.transform_return(ihat_prime, jhat_prime * done)
-            .transform_return(inverse_transformation_matrix_jhat_prime);
+        corner_grid_bottom_left.transform_return(ihat_prime, jhat_prime * done);
+    toDrawEnd = corner_grid_bottom_right.transform_return(ihat_prime,
+                                                          jhat_prime * done);
     draw_line_vec(toDrawStart, toDrawEnd, PURPLE);
   }
 }
+
+// here just for checking if stuff is transforming right, delete it later
+// TODO
 void drawGridOLD(int spacing, mml::matrix transformation_matrix) {
 
   mml::vector2 win = global.win / 1.2;
@@ -257,6 +257,30 @@ void drawGridOLD(int spacing, mml::matrix transformation_matrix) {
                                                           jhat_prime * done);
     draw_line_vec(toDrawStart, toDrawEnd, PURPLE);
   }
+}
+
+// dont use these rn, i havent checked if they work in an eternity uwu
+// TODO
+Image genGridImage_normal(int spacing) {
+  mml::vector2 win = global.win;
+  mml::vector2 origin = global.origin;
+  Image img = GenImageColor(global.win.x, global.win.y, BLACK);
+
+  ImageDrawLine(&img, origin.x, win.y, origin.x, 0, WHITE);
+  ImageDrawLine(&img, win.x, origin.y, 0, origin.y, WHITE);
+  for (int i = 1; i < origin.x / spacing; i++) {
+    ImageDrawLine(&img, origin.x + i * spacing, win.y, origin.x + i * spacing,
+                  0, DARKGRAY);
+    ImageDrawLine(&img, origin.x - i * spacing, win.y, origin.x - i * spacing,
+                  0, DARKGRAY);
+  }
+  for (int i = 1; i < origin.y / spacing; i++) {
+    ImageDrawLine(&img, win.x, origin.y + i * spacing, 0,
+                  origin.y + i * spacing, DARKGRAY);
+    ImageDrawLine(&img, win.x, origin.y - i * spacing, 0,
+                  origin.y - i * spacing, DARKGRAY);
+  }
+  return img;
 }
 Image genGridImage(int spacing, mml::vector2 ihat_prime,
                    mml::vector2 jhat_prime) {
@@ -340,4 +364,8 @@ Image genGridImage(int spacing, mml::vector2 ihat_prime,
                   DARKGRAY);
   }
   return img;
+}
+void saveImage(Image img, std::string name) {
+  ExportImage(img, name.c_str());
+  UnloadImage(img);
 }
