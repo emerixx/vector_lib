@@ -135,7 +135,7 @@ void drawGrid(int spacing, mml::matrix transformation_matrix) {
 
   mml::matrix inverse_transformation_matrix_jhat_prime = mml::matrix({2, 2});
   inverse_transformation_matrix_jhat_prime = temp_trans_matrix.inverse();
-  if (transformation_matrix[0, 1] < 0)
+  if (transformation_matrix[0, 1] < 0 || transformation_matrix[1, 0] < 0)
     transformation_matrix.invert();
   mml::vector2 ihat_prime = {transformation_matrix[0, 0],
                              transformation_matrix[1, 0]};
