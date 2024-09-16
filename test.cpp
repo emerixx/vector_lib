@@ -26,7 +26,7 @@ int main() {
   while (!WindowShouldClose()) {
     if (theta < 2 * pi) {
       theta += 1.f / 600;
-      mtrx[0] = {cos(theta), -sin(theta)};
+      mtrx[0] = {-cos(theta), -sin(theta)};
       // mtrx[0] = {1, theta};
       mtrx[1] = {sin(theta), cos(theta)};
       // mtrx[1] = {theta, 1};
@@ -42,7 +42,7 @@ int main() {
 
     ClearBackground(BLACK);
     DrawTexture(grid, 0, 0, WHITE);
-    drawGrid(30, mtrx);
+    drawGrid(60, mtrx);
     // drawVector(origin, vec, clrs[0]);
     //  drawGrid(60, normal_matrix);
 

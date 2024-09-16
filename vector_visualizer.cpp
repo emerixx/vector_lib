@@ -69,28 +69,29 @@ void drawVector(const mml::vector2 origin, mml::vector2 vec, const Color clr) {
 // TODO
 // TODO
 // fix pls
-void drawGrid(int spacing, mml::matrix transformation_matrix) {
-
+void drawGrid(int spacing_arg, mml::matrix transformation_matrix) {
   mml::vector2 win = global.win / 2;
+  mml::vector2 spacing = mml::vector2(win.y, win.x) * spacing_arg / win.mag();
   mml::vector2 origin = global.origin;
   double done = 0;
   mml::vector2 toDrawStart;
   mml::vector2 toDrawEnd;
 
-  mml::matrix normal_matrix = mml::matrix({2, 2});
-  normal_matrix[0] = {1, 0};
-  normal_matrix[1] = {0, 1};
-  mml::vector2 normal_ihat, normal_jhat;
-  normal_ihat = {normal_matrix[0, 0], normal_matrix[1, 0]};
-  normal_jhat = {normal_matrix[0, 1], normal_matrix[1, 1]};
-  // transform each corner (non transformed) by inverse matrix of ihat_prime and
   mml::matrix inverse_transformation_matrix = transformation_matrix.inverse();
-  mml::vector2 corner_grid_top_left = mml::vector2(-win.x / 2, -win.y / 2);
-  mml::vector2 corner_grid_top_right = mml::vector2(win.x / 2, -win.y / 2);
+  mml::vector2 corner_grid_top_left =
+      mml::vector2(-win.x / 2, -win.y / 2)
+          .transform_return(inverse_transformation_matrix);
+  mml::vector2 corner_grid_top_right =
+      mml::vector2(win.x / 2, -win.y / 2)
+          .transform_return(inverse_transformation_matrix);
 
-  mml::vector2 corner_grid_bottom_left = mml::vector2(-win.x / 2, win.y / 2);
+  mml::vector2 corner_grid_bottom_left =
+      mml::vector2(-win.x / 2, win.y / 2)
+          .transform_return(inverse_transformation_matrix);
 
-  mml::vector2 corner_grid_bottom_right = mml::vector2(win.x / 2, win.y / 2);
+  mml::vector2 corner_grid_bottom_right =
+      mml::vector2(win.x / 2, win.y / 2)
+          .transform_return(inverse_transformation_matrix);
 
   mml::vector2 corner_grid_top_left_trans =
       corner_grid_top_left.transform_return(transformation_matrix);
@@ -124,17 +125,7 @@ void drawGrid(int spacing, mml::matrix transformation_matrix) {
   draw_line_vec(corner_grid_top_left_trans, corner_grid_bottom_right_trans,
                 RED);
   // create a method like matrix.basisVectors.ihat, .jhat please :sob:
-  mml::matrix temp_trans_matrix = transformation_matrix;
-  temp_trans_matrix[0, 0] = 1;
-  temp_trans_matrix[1, 0] = 0;
-  mml::matrix inverse_transformation_matrix_ihat_prime = mml::matrix({2, 2});
-  inverse_transformation_matrix_ihat_prime = temp_trans_matrix.inverse();
-  temp_trans_matrix = transformation_matrix;
-  temp_trans_matrix[0, 1] = 0;
-  temp_trans_matrix[1, 1] = 1;
 
-  mml::matrix inverse_transformation_matrix_jhat_prime = mml::matrix({2, 2});
-  inverse_transformation_matrix_jhat_prime = temp_trans_matrix.inverse();
   if (transformation_matrix[0, 1] < 0 || transformation_matrix[1, 0] < 0)
     transformation_matrix.invert();
   mml::vector2 ihat_prime = {transformation_matrix[0, 0],
@@ -142,119 +133,36 @@ void drawGrid(int spacing, mml::matrix transformation_matrix) {
   mml::vector2 jhat_prime = {transformation_matrix[0, 1],
                              transformation_matrix[1, 1]};
 
-  for (int i = 0; i < corner_grid_top_right_trans.mag() / spacing; i++) {
-    done = i / (corner_grid_top_right_trans.mag() / spacing);
+  for (int i = 0; i < corner_grid_top_right_trans.mag() / spacing.x; i++) {
+    done = i / (corner_grid_top_right_trans.mag() / spacing.x);
     // check what point will be at corner_grid_bottom_left after transformation
     // and transform that point
     // create a function to create a 2x2 matrix from jhat and ihat late TODO
 
-    toDrawStart =
-        corner_grid_bottom_left.transform_return(ihat_prime * done, jhat_prime);
-    toDrawEnd =
-        corner_grid_top_left.transform_return(ihat_prime * done, jhat_prime);
-
-    draw_line_vec(toDrawStart, toDrawEnd, GREEN);
-    toDrawStart = corner_grid_bottom_right.transform_return(ihat_prime * done,
+    toDrawStart = corner_grid_bottom_left_trans.transform_return(
+        ihat_prime * done, jhat_prime);
+    toDrawEnd = corner_grid_top_left_trans.transform_return(ihat_prime * done,
                                                             jhat_prime);
-    toDrawEnd =
-        corner_grid_top_right.transform_return(ihat_prime * done, jhat_prime);
-    draw_line_vec(toDrawStart, toDrawEnd, GREEN);
-  }
-  for (int i = 0; i < std::abs(corner_grid_top_right.y) / spacing; i++) {
-    done = i / (std::abs(corner_grid_top_right.y) / spacing);
-    toDrawStart =
-        corner_grid_top_left.transform_return(ihat_prime, jhat_prime * done);
-    toDrawEnd =
-        corner_grid_top_right.transform_return(ihat_prime, jhat_prime * done);
-
-    draw_line_vec(toDrawStart, toDrawEnd, PURPLE);
-    toDrawStart =
-        corner_grid_bottom_left.transform_return(ihat_prime, jhat_prime * done);
-    toDrawEnd = corner_grid_bottom_right.transform_return(ihat_prime,
-                                                          jhat_prime * done);
-    draw_line_vec(toDrawStart, toDrawEnd, PURPLE);
-  }
-}
-
-// here just for checking if stuff is transforming right, delete it later
-// TODO
-void drawGridOLD(int spacing, mml::matrix transformation_matrix) {
-
-  mml::vector2 win = global.win / 1.2;
-  mml::vector2 origin = global.origin;
-  double done = 0;
-  mml::vector2 toDrawStart;
-  mml::vector2 toDrawEnd;
-  mml::vector2 ihat_prime = {transformation_matrix[0, 0],
-                             transformation_matrix[1, 0]};
-  mml::vector2 jhat_prime = {transformation_matrix[0, 1],
-                             transformation_matrix[1, 1]};
-  // transform each corner (non transformed) by inverse matrix of ihat_prime and
-  mml::matrix inverse_transformation_matrix = transformation_matrix.inverse();
-  mml::vector2 corner_grid_top_left = mml::vector2(-win.x / 2, -win.y / 2);
-  mml::vector2 corner_grid_top_right = mml::vector2(win.x / 2, -win.y / 2);
-
-  mml::vector2 corner_grid_bottom_left = mml::vector2(-win.x / 2, win.y / 2);
-
-  mml::vector2 corner_grid_bottom_right = mml::vector2(win.x / 2, win.y / 2);
-
-  mml::vector2 corner_grid_top_left_trans = corner_grid_top_left;
-  mml::vector2 corner_grid_top_right_trans = corner_grid_top_right;
-
-  mml::vector2 corner_grid_bottom_left_trans = corner_grid_bottom_left;
-
-  mml::vector2 corner_grid_bottom_right_trans = corner_grid_bottom_right;
-  // vector <= vector check if all values are <= (x,y and z)
-
-  draw_line_vec(corner_grid_top_left_trans, corner_grid_top_right_trans, WHITE);
-  draw_line_vec(corner_grid_top_right_trans, corner_grid_bottom_right_trans,
-                WHITE);
-  draw_line_vec(corner_grid_bottom_right_trans, corner_grid_bottom_left_trans,
-                WHITE);
-  draw_line_vec(corner_grid_bottom_left_trans, corner_grid_top_left_trans,
-                WHITE);
-
-  draw_line_vec(corner_grid_top_right_trans, corner_grid_bottom_left_trans,
-                RED);
-  draw_line_vec(corner_grid_top_left_trans, corner_grid_bottom_right_trans,
-                RED);
-  // create a method like matrix.basisVectors.ihat, .jhat please :sob:
-
-  mml::matrix inverse_transformation_matrix_ihat_prime = mml::matrix({2, 2});
-  inverse_transformation_matrix_ihat_prime = inverse_transformation_matrix;
-  inverse_transformation_matrix_ihat_prime[0, 0] = 1;
-  inverse_transformation_matrix_ihat_prime[1, 0] = 0;
-  mml::matrix inverse_transformation_matrix_jhat_prime = mml::matrix({2, 2});
-  inverse_transformation_matrix_jhat_prime = inverse_transformation_matrix;
-  inverse_transformation_matrix_jhat_prime[0, 1] = 0;
-  inverse_transformation_matrix_jhat_prime[1, 1] = 1;
-
-  for (int i = 0; i < corner_grid_top_right_trans.x / spacing; i++) {
-    done = i / (corner_grid_top_right_trans.x / spacing);
-    toDrawStart =
-        corner_grid_bottom_left.transform_return(ihat_prime * done, jhat_prime);
-    toDrawEnd =
-        corner_grid_top_left.transform_return(ihat_prime * done, jhat_prime);
 
     draw_line_vec(toDrawStart, toDrawEnd, GREEN);
-    toDrawStart = corner_grid_bottom_right.transform_return(ihat_prime * done,
-                                                            jhat_prime);
-    toDrawEnd =
-        corner_grid_top_right.transform_return(ihat_prime * done, jhat_prime);
+    toDrawStart = corner_grid_bottom_right_trans.transform_return(
+        ihat_prime * done, jhat_prime);
+    toDrawEnd = corner_grid_top_right_trans.transform_return(ihat_prime * done,
+                                                             jhat_prime);
     draw_line_vec(toDrawStart, toDrawEnd, GREEN);
   }
-  for (int i = 0; i < origin.y / spacing; i++) {
-    done = i / (origin.y / spacing);
-    toDrawStart =
-        corner_grid_top_left.transform_return(ihat_prime, jhat_prime * done);
-    toDrawEnd =
-        corner_grid_top_right.transform_return(ihat_prime, jhat_prime * done);
+  for (int i = 0; i < corner_grid_top_right_trans.mag() / spacing.y; i++) {
+    done = i / (corner_grid_top_right_trans.mag() / spacing.y);
+    toDrawStart = corner_grid_top_left_trans.transform_return(
+        ihat_prime, jhat_prime * done);
+    toDrawEnd = corner_grid_top_right_trans.transform_return(ihat_prime,
+                                                             jhat_prime * done);
 
     draw_line_vec(toDrawStart, toDrawEnd, PURPLE);
-    toDrawStart =
-        corner_grid_bottom_left.transform_return(ihat_prime, jhat_prime * done);
-    toDrawEnd = corner_grid_bottom_right.transform_return(ihat_prime,
-                                                          jhat_prime * done);
+    toDrawStart = corner_grid_bottom_left_trans.transform_return(
+        ihat_prime, jhat_prime * done);
+    toDrawEnd = corner_grid_bottom_right_trans.transform_return(
+        ihat_prime, jhat_prime * done);
     draw_line_vec(toDrawStart, toDrawEnd, PURPLE);
   }
 }
